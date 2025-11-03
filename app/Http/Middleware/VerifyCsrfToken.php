@@ -12,6 +12,11 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        //
+        // WARNING: This is just for demonstration purposes.
+        // Excluding routes from CSRF protection can lead to security vulnerabilities:
+        // 1. Cross-Site Request Forgery attacks
+        // 2. Unauthorized state-changing requests
+        // 3. Session hijacking risks
+        'api/webhook'
     ];
 }

@@ -1,0 +1,1 @@
+{{-- Unused admin view: using shared view resources/views/articles/index.blade.php instead. --}}

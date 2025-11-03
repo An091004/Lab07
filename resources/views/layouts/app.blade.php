@@ -1,61 +1,36 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
-<head>
-    <meta charset="utf-8">
-    <title>@yield('title','Articles')</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        body {
-            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial,
-                sans-serif;
-        }
+        <title>{{ config('app.name', 'Laravel') }}</title>
 
-        .container {
-            max-width: 960px;
-            margin: 24px auto;
-        }
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-        .flash {
-            padding: 10px;
-            margin-bottom: 12px;
-            background: #ECFDF5;
-            color: #065F46;
-            border-radius: 8px;
-        }
+        <!-- Scripts -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    </head>
+    <body class="font-sans antialiased">
+        <div class="min-h-screen bg-gray-100">
+            @include('layouts.navigation')
 
-        nav a {
-            margin-right: 8px;
-        }
+            <!-- Page Heading -->
+            @if (isset($header))
+                <header class="bg-white shadow">
+                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        {{ $header }}
+                    </div>
+                </header>
+            @endif
 
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        th,
-        td {
-            border: 1px solid #e5e7eb;
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background: #f3f4f6;
-        }
-    </style>
-    @stack('styles')
-</head>
-
-<body>
-    @include('partials.nav')
-    <div class="container">
-        @if(session('success'))
-        <div class="flash">{{ session('success') }}</div>
-        @endif
-        @yield('content')
-    </div>
-    @include('partials.footer')
-    @stack('scripts')
-</body>
+            <!-- Page Content -->
+            <main>
+                {{ $slot }}
+            </main>
+        </div>
+    </body>
 </html>

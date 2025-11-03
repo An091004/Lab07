@@ -1,38 +1,64 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ArticleController;
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
 |
 | Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
 |
 */
-// 1. Route có tham số động
-Route::get('/articles/page/{page}', function ($page) {
-    return "Trang bài viết số: " . (int)$page;
-})->whereNumber('page')->name('articles.page');
 
-// 2. Tham số tuỳ chọn + regex slug
-Route::get('/articles/slug/{slug?}', function ($slug = 'khong-co-slug') {
-    return "Slug: " . $slug;
-})->where('slug', '[a-z0-9-]+');
-
-// 3. Route group với prefix
-Route::prefix('admin')->group(function () {
-    Route::get('/articles', fn() => 'Quản trị bài viết')
-        ->name('admin.articles.index');
-});
 Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
+// Xem danh sách & chi tiết: công khai
+Route::resource('articles', ArticleController::class)->only(['index', 'show']);
 
-// Route Model Binding demo (implicit)
-Route::get('/articles/show/{article}', [ArticleController::class, 'show']);
-Route::resource('articles', ArticleController::class);
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Các thao tác yêu cầu đăng nhập (có ràng buộc quyền)
+    Route::get('/articles/create', [ArticleController::class, 'create'])
+        ->name('articles.create')
+        ->middleware('can:create,App\\Models\\Article');
+
+    Route::post('/articles', [ArticleController::class, 'store'])
+        ->name('articles.store')
+        ->middleware('can:create,App\\Models\\Article');
+
+    Route::get('/articles/{article}/edit', [ArticleController::class, 'edit'])
+        ->name('articles.edit')
+        ->middleware('can:update,article');
+
+    Route::put('/articles/{article}', [ArticleController::class, 'update'])
+        ->name('articles.update')
+        ->middleware('can:update,article');
+
+    Route::delete('/articles/{article}', [ArticleController::class, 'destroy'])
+        ->name('articles.destroy')
+        ->middleware('can:delete,article');
+
+    // Khu vực admin
+    Route::prefix('admin')
+        ->middleware(['admin'])
+        ->group(function () {
+            Route::resource('articles', ArticleController::class)
+                ->names('admin.articles');
+        });
+});
+
+require __DIR__.'/auth.php';

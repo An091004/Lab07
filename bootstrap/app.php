@@ -1,5 +1,10 @@
 <?php
+use App\Http\Middleware\CheckAdmin;
 
+use Illuminate\Foundation\Application;
+$app = new Application(
+    $_ENV['APP_BASE_PATH'] ?? dirname(__DIR__)
+);
 /*
 |--------------------------------------------------------------------------
 | Create The Application
